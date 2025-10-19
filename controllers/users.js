@@ -12,9 +12,8 @@ const getUsers = (req, res) => {
     });
 };
 
-// POST
 const createUser = (req, res) => {
-  console.log(req.body);
+  //console.log(req.body);
   const { name, avatar } = req.body;
 
   User.create({ name, avatar })
@@ -39,7 +38,8 @@ const getUserById = (req, res) => {
       console.error(err);
       if (err.name === "DocumentNotFoundError") {
         return res.status(404).send({ message: "Invalid user ID." });
-      } else if (err.name === "CastError") {
+      }
+      if (err.name === "CastError") {
         return res.status(400).send({ message: "User not found." });
       }
       return res

@@ -7,9 +7,7 @@ const app = express();
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
-  .then(() => {
-    console.log("Connected to MongoDB");
-  })
+  .then(() => {})
   .catch(console.error);
 
 app.use(express.json());
@@ -21,6 +19,4 @@ app.use((req, res, next) => {
 
 app.use("/", mainRouter);
 
-app.listen(3001, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+app.listen(3001, () => {});

@@ -38,7 +38,7 @@ const updateItem = (req, res) => {
   ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
     .orFail()
     .then((item) => res.status(200).send(item))
-    .catch((err) => {
+    .catch(() => {
       res.status(500).send({ message: "Error updating the clothing item." });
     });
 };
@@ -48,8 +48,10 @@ const deleteItem = (req, res) => {
 
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
-    .then((item) => res.status(200).send({ message: "Clothing item deleted." }))
-    .catch((err) => {
+    .then((deletedItem) =>
+      res.status(200).send({ message: "Clothing item deleted.", deletedItem })
+    )
+    .catch(() => {
       res.status(500).send({ message: "Error deleting the clothing item." });
     });
 };
