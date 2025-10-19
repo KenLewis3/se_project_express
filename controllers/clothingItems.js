@@ -2,7 +2,7 @@ const ClothingItem = require("../models/clothingItem");
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
-  const owner = "6713cf937623fbdb3a24cfd4"; // Temporary hardcoded owner ID
+  const owner = req.user._id;
 
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(201).send({ data: item }))
@@ -54,4 +54,53 @@ const deleteItem = (req, res) => {
     });
 };
 
-module.exports = { createItem, getAllItems, updateItem, deleteItem };
+const likeItem = (req, res) => {
+  const userId = req.user._id;
+
+  ClothingItem.findByIdAndUpdate(
+    req.params.itemId,
+    { $addToSet: { likes: userId } },
+    { new: true }
+  )
+    .then((item) => {
+      if (!item) {
+        return res.status(404).send({ message: "Clothing item not found." });
+      }
+      return res.status(200).send(item);
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).send({ message: "Error liking clothing item." });
+    });
+};
+
+const dislikeItem = (req, res) => {
+  const userId = req.user._id;
+
+  ClothingItem.findByIdAndUpdate(
+    req.params.itemId,
+    { $pull: { likes: userId } },
+    { new: true }
+  )
+    .then((item) => {
+      if (!item) {
+        return res.status(404).send({ message: "Clothing item not found." });
+      }
+      return res.status(200).send(item);
+    })
+    .catch((err) => {
+      console.error(err);
+      return res
+        .status(500)
+        .send({ message: "Error disliking clothing item." });
+    });
+};
+
+module.exports = {
+  createItem,
+  getAllItems,
+  updateItem,
+  deleteItem,
+  likeItem,
+  dislikeItem,
+};
