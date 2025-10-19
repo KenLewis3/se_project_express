@@ -12,6 +12,7 @@ const getUsers = (req, res) => {
     });
 };
 
+// POST
 const createUser = (req, res) => {
   console.log(req.body);
   const { name, avatar } = req.body;
