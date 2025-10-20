@@ -1,6 +1,5 @@
 const User = require("../models/user");
 
-// GET /users
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send(users))
@@ -13,7 +12,6 @@ const getUsers = (req, res) => {
 };
 
 const createUser = (req, res) => {
-  //console.log(req.body);
   const { name, avatar } = req.body;
 
   User.create({ name, avatar })
