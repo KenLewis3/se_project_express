@@ -31,18 +31,6 @@ const getAllItems = (req, res) => {
     });
 };
 
-const updateItem = (req, res) => {
-  const { itemId } = req.params;
-  const { imageUrl } = req.body;
-
-  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } })
-    .orFail()
-    .then((item) => res.status(200).send(item))
-    .catch(() => {
-      res.status(500).send({ message: "Error updating the clothing item." });
-    });
-};
-
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
