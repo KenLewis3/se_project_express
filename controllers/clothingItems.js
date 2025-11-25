@@ -36,12 +36,24 @@ const getAllItems = (req, res) => {
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
+  const userId = req.user._id;
 
-  ClothingItem.findByIdAndDelete(itemId)
+  ClothingItem.findById(itemId)
     .orFail()
-    .then((deletedItem) =>
-      res.send({ message: "Clothing item deleted.", data: deletedItem })
-    )
+    .then((item) => {
+      if (item.owner.toString() !== userId) {
+        return res
+          .status(403)
+          .send({ message: "You do not have permission to delete this item." });
+      }
+
+      return ClothingItem.findByIdAndDelete(itemId).then((deletedItem) => {
+        return res.send({
+          message: "Clothing item deleted.",
+          data: deletedItem,
+        });
+      });
+    })
     .catch((err) => {
       console.error(err);
 
@@ -57,7 +69,7 @@ const deleteItem = (req, res) => {
 
       return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occured on the server." });
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
