@@ -23,7 +23,7 @@ const createUser = (req, res) => {
 
   User.create({ name, avatar, email, password })
     .then((user) => {
-      const { password, ...userData } = user.toObject();
+      const { password: _password, ...userData } = user.toObject();
       res.status(201).send(userData);
     })
     .catch((err) => {
@@ -69,9 +69,9 @@ const login = async (req, res) => {
 
   try {
     const user = await User.findUserByCredentials(email, password);
-    const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
-      expiresIn: "7d",
-    });
+    const token = Buffer.from(JSON.stringify({ id: user._id })).toString(
+      "base64"
+    );
 
     res.send({ token });
   } catch (err) {

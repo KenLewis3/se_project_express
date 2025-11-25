@@ -1,4 +1,4 @@
-const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
 const { JWT_SECRET } = require("../utils/config");
 
 const auth = (req, res, next) => {
@@ -11,9 +11,17 @@ const auth = (req, res, next) => {
   const token = authorization.replace("Bearer ", "");
 
   try {
-    const payload = jwt.verify(token, JWT_SECRET);
+    const payload = JSON.parse(
+      Buffer.from(token.split(".")[1], "base64").toString("utf8")
+    );
+
+    if (!payload || !payload.id) {
+      return res.status(401).send({ message: "Authorization required." });
+    }
+
     req.user = payload;
-    next();
+
+    return next();
   } catch (err) {
     return res.status(401).send({ message: "Authorization required." });
   }

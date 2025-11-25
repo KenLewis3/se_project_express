@@ -47,12 +47,12 @@ const deleteItem = (req, res) => {
           .send({ message: "You do not have permission to delete this item." });
       }
 
-      return ClothingItem.findByIdAndDelete(itemId).then((deletedItem) => {
-        return res.send({
+      return ClothingItem.findByIdAndDelete(itemId).then((deletedItem) =>
+        res.send({
           message: "Clothing item deleted.",
           data: deletedItem,
-        });
-      });
+        })
+      );
     })
     .catch((err) => {
       console.error(err);
