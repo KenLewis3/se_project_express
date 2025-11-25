@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const crypto = require("crypto");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -39,16 +40,28 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+userSchema.pre("save", function (next) {
+  if (!this.isModified("password")) {
+    return next();
+  }
+
+  this.password = crypto
+    .createHash("sha256")
+    .update(this.password)
+    .digest("hex");
+
+  next();
+});
+
 userSchema.statics.findUserByCredentials = async function (email, password) {
-  const bcrypt = require("bcryptjs");
+  const hashed = crypto.createHash("sha256").update(password).digest("hex");
 
   const user = await this.findOne({ email }).select("+password");
   if (!user) {
     throw new Error("Invalid login credentials");
   }
 
-  const isPasswordMatch = await bcrypt.compare(password, user.password);
-  if (!isPasswordMatch) {
+  if (user.password !== hashed) {
     throw new Error("Invalid login credentials");
   }
 
