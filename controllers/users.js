@@ -21,10 +21,10 @@ const getUsers = (req, res) => {
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
-  User.create({ name, avatar, email, password })
+  return User.create({ name, avatar, email, password })
     .then((user) => {
       const { password: _password, ...userData } = user.toObject();
-      res.status(201).send(userData);
+      return res.status(201).send(userData);
     })
     .catch((err) => {
       console.error(err);
@@ -36,7 +36,7 @@ const createUser = (req, res) => {
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid data." });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error has occurred on the server." });
     });
@@ -45,7 +45,7 @@ const createUser = (req, res) => {
 const getCurrentUser = (req, res) => {
   const userId = req.user._id;
 
-  User.findById(userId)
+  return User.findById(userId)
     .orFail()
     .then((user) => res.send(user))
     .catch((err) => {
@@ -58,7 +58,7 @@ const getCurrentUser = (req, res) => {
       if (err.name === "CastError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid data." });
       }
-      res
+      return res
         .status(500)
         .send({ message: "An error occurred while retrieving the user." });
     });
@@ -74,10 +74,10 @@ const login = async (req, res) => {
       expiresIn: "7d",
     });
 
-    res.send({ token });
+    return res.send({ token });
   } catch (err) {
     console.error(err);
-    res.status(401).send({ message: "Invalid email or password." });
+    return res.status(401).send({ message: "Invalid email or password." });
   }
 };
 
@@ -85,7 +85,7 @@ const updateCurrentUser = (req, res) => {
   const userId = req.user._id;
   const { name, avatar } = req.body;
 
-  User.findByIdAndUpdate(
+  return User.findByIdAndUpdate(
     userId,
     { name, avatar },
     { new: true, runValidators: true }
@@ -102,7 +102,7 @@ const updateCurrentUser = (req, res) => {
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: "Invalid data." });
       }
-      res
+      return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error has occurred on the server." });
     });
