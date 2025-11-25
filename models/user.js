@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -40,19 +39,9 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.pre("save", async function (next) {
-  if (this.isModified("password")) return next();
-
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (err) {
-    next(err);
-  }
-});
-
 userSchema.statics.findUserByCredentials = async function (email, password) {
+  const bcrypt = require("bcryptjs");
+
   const user = await this.findOne({ email }).select("+password");
   if (!user) {
     throw new Error("Invalid login credentials");
