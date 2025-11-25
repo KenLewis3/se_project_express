@@ -56,18 +56,16 @@ userSchema.pre("save", function (next) {
 userSchema.statics.findUserByCredentials = async function (email, password) {
   const hashed = crypto.createHash("sha256").update(password).digest("hex");
 
-  const user = await this.findOne({ email }).select("+password");
-  if (!user) {
+  const invalid = () => {
     throw new Error("Invalid login credentials");
-  }
+  };
 
-  if (user.password !== hashed) {
-    throw new Error("Invalid login credentials");
-  }
+  const user = await this.findOne({ email }).select("+password");
+
+  if (!user) invalid();
+  if (user.password !== hashed) invalid();
 
   return user;
-
-  return null;
 };
 
 module.exports = mongoose.model("user", userSchema);
