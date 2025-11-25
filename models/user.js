@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-const crypto = require("crypto");
+const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -40,30 +40,24 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.pre("save", function (next) {
-  if (!this.isModified("password")) {
-    return next();
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  try {
+    const salt = await bcrypt.genSalt(10);
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (err) {
+    next(err);
   }
-
-  this.password = crypto
-    .createHash("sha256")
-    .update(this.password)
-    .digest("hex");
-
-  next();
 });
 
 userSchema.statics.findUserByCredentials = async function (email, password) {
-  const hashed = crypto.createHash("sha256").update(password).digest("hex");
-
-  const invalid = () => {
-    throw new Error("Invalid login credentials");
-  };
-
   const user = await this.findOne({ email }).select("+password");
+  if (!user) throw new Error("Invalid login credentials");
 
-  if (!user) invalid();
-  if (user.password !== hashed) invalid();
+  const isMatch = await bcrypt.compare(password, user.password);
+  if (!isMatch) throw new Error("Invalid login credentials");
 
   return user;
 };
