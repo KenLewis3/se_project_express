@@ -12,6 +12,8 @@ mongoose
   .then(() => {})
   .catch(console.error);
 
+app.use(cors());
+
 app.use(express.json());
 
 app.use("/", mainRouter);
@@ -20,6 +22,6 @@ app.use((req, res) => {
   res.status(NOT_FOUND).send({ message: "Requested resource not found." });
 });
 
-app.use(cors());
-
-app.listen(PORT, () => {});
+app.listen(PORT, () => {
+  console.log(`App listening on port ${PORT}`);
+});

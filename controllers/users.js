@@ -5,6 +5,8 @@ const {
   INTERNAL_SERVER_ERROR,
   BAD_REQUEST,
   NOT_FOUND,
+  CONFLICT,
+  UNAUTHORIZED,
 } = require("../utils/errors");
 
 const getUsers = (req, res) => {
@@ -30,7 +32,7 @@ const createUser = (req, res) => {
       console.error(err);
       if (err.code === 11000) {
         return res
-          .status(409)
+          .status(CONFLICT)
           .send({ message: "A user with this email already exists." });
       }
       if (err.name === "ValidationError") {
@@ -59,7 +61,7 @@ const getCurrentUser = (req, res) => {
         return res.status(BAD_REQUEST).send({ message: "Invalid data." });
       }
       return res
-        .status(500)
+        .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An error occurred while retrieving the user." });
     });
 };
@@ -77,7 +79,9 @@ const login = async (req, res) => {
     return res.send({ token });
   } catch (err) {
     console.error(err);
-    return res.status(401).send({ message: "Invalid email or password." });
+    return res
+      .status(UNAUTHORIZED)
+      .send({ message: "Invalid email or password." });
   }
 };
 

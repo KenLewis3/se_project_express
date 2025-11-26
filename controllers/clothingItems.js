@@ -3,6 +3,7 @@ const {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   NOT_FOUND,
+  FORBIDDEN,
 } = require("../utils/errors");
 
 const createItem = (req, res) => {
@@ -17,8 +18,7 @@ const createItem = (req, res) => {
         return res.status(BAD_REQUEST).send({ message: "Invalid data." });
       }
       return res.status(INTERNAL_SERVER_ERROR).send({
-        message: "An error has occured on the server.",
-        err,
+        message: "An error has occurred on the server.",
       });
     });
 };
@@ -30,7 +30,7 @@ const getAllItems = (req, res) => {
       console.error(err);
       return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occured on the server." });
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -43,7 +43,7 @@ const deleteItem = (req, res) => {
     .then((item) => {
       if (item.owner.toString() !== userId) {
         return res
-          .status(403)
+          .status(FORBIDDEN)
           .send({ message: "You do not have permission to delete this item." });
       }
 
@@ -100,7 +100,7 @@ const likeItem = (req, res) => {
 
       return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occured on the server." });
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
@@ -130,7 +130,7 @@ const dislikeItem = (req, res) => {
       }
       return res
         .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "An error has occured on the server." });
+        .send({ message: "An error has occurred on the server." });
     });
 };
 
